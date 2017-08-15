@@ -5,4 +5,4 @@
 
 #直接浏览器打开即可
 #效果如下：
-![Image text]https://github.com/ObearO/GrantHao/blob/master/img/a.gif
+![Image text](https://github.com/ObearO/GrantHao/blob/master/img/a.gif)
