@@ -5,3 +5,4 @@
 *.img
 out
 gen
+.idea/vcs.xml
