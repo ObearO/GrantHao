@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html>
+<head>
+  <title>Canvas</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, minimum-scale=1">
+  <style>
+    html, body {
+      overflow: hidden;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', 'Helvetica Neue', 'Hiragino Sans GB', 'LiHei Pro', Arial, sans-serif;
+      color: #333;
+    }
+
+    #wrapper {
+      position: absolute;
+      left: 0;
+      width: 320px;
+      text-align: center;
+      top: 50%;
+      left: 50%;
+      margin-left: -160px;
+      margin-top: -160px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      user-select: none;
+    }
+
+    h1 {
+      font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 9px;
+      text-transform: uppercase;
+      margin: 12px 0;
+      left: 4px;
+    }
+
+    h2 {
+      color: #666;
+      font-weight: normal;
+      font-size: 15px;
+      letter-spacing: .12em;
+      margin-bottom: 30px;
+      left: 3px;
+    }
+
+    h1, h2 {
+      position: relative;
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 2em;
+      margin: 0;
+      letter-spacing: 2px;
+    }
+
+    a {
+      color: #999;
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    a:hover {
+      color: #f33;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<div id="wrapper">
+  <h1>Grant Hao</h1>
+  <h2>Design, Code &amp; Things in Between&nbsp;</h2>
+  <p><a href="https://github.com/ObearO" target="_blank">Github</a></p>
+  <p><a href="http://weibo.com/u/2644126100" target="_blank">微博</a></p>
+  <p><a href="https://www.zhihu.com/people/hao-guo-liang-84/" target="_blank">知乎</a></p>
+</div>
+<canvas></canvas>
+<script>
+  document.addEventListener('touchmove', function(e) {
+    e.preventDefault()
+  })
+  var c = document.getElementsByTagName('canvas')[0],
+      x = c.getContext('2d'),
+      pr = window.devicePixelRatio || 1,
+      w = window.innerWidth,
+      h = window.innerHeight,
+      f = 90,
+      background = '#fff',
+      q,
+      m = Math,
+      r = 0,
+      u = m.PI * 2,
+      v = m.cos,
+      z = m.random,
+      nodes = []
+
+  window.onresize = function() {
+    c.width = w * pr
+    c.height = h * pr
+
+    if (nodes.length == 0) {
+      constructNodes();
+    }
+
+    step();
+  }
+  window.onresize();
+
+  x.scale(pr, pr)
+  x.globalAlpha = 0.6
+
+  function constructNodes() {
+    nodes = [{x: 0, y: h * .7 + f, vy: -0.5}, {x: 0, y: h * .7 - f, vy: 0.5}]
+    while (nodes[nodes.length - 1].x < w + f) {
+      nodes[nodes.length] = {
+        x: nodes[nodes.length - 1].x + (z() * 2 - 0.25) * f,
+        y: y(nodes[nodes.length - 1].y),
+        vy: Math.random() * 1 - 0.5,
+        org_r: nodes.length * u / (c.width / (0.75 * f))
+      }
+      console.log(nodes[nodes.length])
+    }
+  }
+
+  function step() {
+    nodes.forEach(function(e) {
+      e.y += e.vy
+      //颜色变化
+//      e.org_r += u / 200
+
+      function clamp(min, max, value) {
+        if (value > max) {
+          return max;
+        } else if (value < min) {
+          return min;
+        } else {
+          return value;
+        }
+      }
+
+      if (e.y <= 0.2 * c.height || e.y >= 0.8 * c.height) {
+        e.vy *= -1;
+        e.y = clamp(0.2 * c.height, 0.8 * c.height, e.y)
+      }
+    })
+
+    render();
+    window.requestAnimationFrame(step);
+  }
+
+  function render() {
+    x.fillStyle = background
+    x.fillRect(0, 0, c.width, c.height);
+    var k = 0;
+    for (k; k < nodes.length - 2; k++) {
+      x.beginPath()
+      x.moveTo(nodes[k].x, nodes[k].y)
+      x.lineTo(nodes[k + 1].x, nodes[k + 1].y)
+      x.lineTo(nodes[k + 2].x, nodes[k + 2].y)
+      x.closePath()
+      r = nodes[k + 2].org_r
+      x.fillStyle = '#' + (v(r) * 127 + 128 << 16 | v(r + u / 3) * 127 + 128 << 8 | v(r + u / 3 * 2) * 127 + 128).toString(16)
+      if (x.fillStyle == '#ffffff') {
+        x.fillStyle = '#' + (v(r + u / 100) * 127 + 128 << 16 | v(r + u / 3 + u / 100) * 127 + 128 << 8 | v(r + u / 200 + u / 3 * 2) * 127 + 128).toString(16)
+      }
+      x.fill()
+    }
+  }
+
+  function y(p) {
+    var t = p + (z() * 2 - 1.1) * f
+    return (t > h || t < 0) ? y(p) : t
+  }
+</script>
+</body>
+</html>
